@@ -1,6 +1,6 @@
 # UPI Guard — Payment Screenshot Forensics (Demo)
 
-A responsive, installable PWA prototype for merchant-side screening of UPI payment screenshots. Includes an animated dashboard, upload/drag-and-drop, app-family selector (Google Pay, PhonePe, Paytm), optional pasted OCR text, local heuristic checks, risk score, result explanations, and local scan history.
+A responsive, installable PWA prototype for merchant-side screening of UPI payment screenshots. Includes an animated dashboard, upload/drag-and-drop, app-family selector (Google Pay, PhonePe, Paytm), on-device English OCR, extracted payment fields, local heuristic checks, risk score, result explanations, and local scan history.
 
 ## Run locally
 
@@ -22,12 +22,16 @@ Open the app in Microsoft Edge or Google Chrome, then use the browser install co
 - `index.html` — app structure and dashboard
 - `styles.css` — responsive visual design, hover states, transitions, light theme
 - `app.js` — upload handling, image sampling, heuristic checks, risk score, local history
+- `ocr.js` — on-device OCR flow and extracted-field display
+- `payment-data.js` — amount, transaction ID, date/time, party, status, and app text parsing
 - `manifest.webmanifest` — PWA metadata
 - `sw.js` — basic offline asset cache
 
 ## Current capabilities and important limitations
 
-This is a front-end proof-of-concept, not a bank-grade fraud detector. It does **not** authenticate screenshots against official app templates, inspect font glyphs at forensic depth, perform OCR automatically, query NPCI/banks, or prove that funds were credited. The app-family selector is currently used as a text-hint check when text is pasted; it is not a verified layout classifier. The pixel profile and dimensions are weak signals only. The optional text field accepts OCR output copied from another OCR tool.
+This is a front-end proof-of-concept, not a bank-grade fraud detector. English OCR runs in the browser with Tesseract.js after its library and language data are loaded; the screenshot itself is not uploaded. The app shows recognized text and attempts to extract amount, transaction/UTR ID, date/time, sender, recipient, payment wording, and app name. OCR and field extraction can be incomplete or incorrect, especially for blurry, cropped, or non-English screenshots.
+
+The app does **not** authenticate screenshots against official app templates, inspect font glyphs at forensic depth, query NPCI/banks, or prove that funds were credited. Risk scores are weak demo heuristics, not a determination that a payment is genuine or fraudulent. The app-family selector is currently used as a text-hint check; it is not a verified layout classifier. The pixel profile and dimensions are weak signals only.
 
 The app flags transaction IDs repeated in this browser's local scan history and checks pasted date strings for obviously future/old timestamps. Browser history is local to the device and can be cleared.
 
@@ -42,4 +46,4 @@ The app flags transaction IDs repeated in this browser's local scan history and 
 
 ## Privacy
 
-The demo processes image pixels in the browser and does not upload the screenshot. Pasted text and scan history remain in browser memory/localStorage. Do not deploy with real customer data until privacy, retention and security requirements are reviewed.
+The demo processes image pixels and OCR in the browser and does not upload the screenshot. The first OCR use requires an internet connection to load the OCR library and English language data from their CDN; that provider receives normal asset requests, not the screenshot. Pasted text and scan history remain in browser memory/localStorage. Do not deploy with real customer data until privacy, retention and security requirements are reviewed.
